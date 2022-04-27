@@ -9,7 +9,9 @@
 
 //6 første taler en gyldig dato
 
+
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace CPR_Opgave
 {
@@ -21,24 +23,15 @@ namespace CPR_Opgave
             bool pass;
             do
             {
-
                 string cprnr;
-                do {
+                string[] cpr;
+                do
+                {
                     Console.Write("Indtast CPR-Nummer(ddMMyy-xxxx): ");
                     cprnr = Console.ReadLine();
-                }while (cprnr == "" || cprnr.Length != 11);
+                    cpr = cprnr.Split("-");
 
-                string[] cpr = cprnr.Split("-");
-
-                //bool length = IsLength(cprnr);
-                //bool bind = Bindestreg(cprnr);
-                //bool num = IsNotNumbers(cpr[0]);
-                //bool num1 = IsNotNumbers(cpr[1]);
-
-                //Console.WriteLine(bind);
-                //Console.WriteLine(num);
-                //Console.WriteLine(num1);
-                //Console.WriteLine(length);
+                } while (cprnr == "" || cpr[0].Length != 6 || cpr[1].Length != 4);
 
                 pass = Pass(cpr, cprnr);
                 if (pass)
@@ -52,7 +45,17 @@ namespace CPR_Opgave
 
             } while (!pass);
         }
-
+        static internal bool Pass(string[] cpr, string cprnr)
+        {
+            if (IsLength(cprnr) & IsNotNumbers(cpr[0]) & IsNotNumbers(cpr[1]) & Bindestreg(cprnr) & IsDate(cpr[0]))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         static internal bool IsNotNumbers(string cprnr)
         {
             Regex check = new Regex(@"\D");
@@ -67,10 +70,20 @@ namespace CPR_Opgave
                 return true;
             }
         }
-        //static internal bool IsDate(string cprnr)
-        //{
-
-        //}
+        static internal bool IsDate(string cprnr)
+        {
+            DateTime result;
+            if (!DateTime.TryParseExact(cprnr, "ddMMyy", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out result))
+            {
+                Console.WriteLine("Ikke Korrekt dato");
+                return false;
+            }
+            else
+            {
+                Console.WriteLine("Korrekt Dato!");
+                return true;
+            }
+        }
         static internal bool IsLength(string cprnr)
         {
             if (cprnr.Length == 11)
@@ -85,23 +98,12 @@ namespace CPR_Opgave
         static internal bool Bindestreg(string cprnr)
         {
             char[] cpr = cprnr.ToCharArray();
-            if(cpr[6] == '-')
-            {
-                return true;
-            }
-            else            
-                return false;            
-        }
-        static internal bool Pass(string[] cpr, string cprnr)
-        {
-            if(IsLength(cprnr) & IsNotNumbers(cpr[0]) & IsNotNumbers(cpr[1]) & Bindestreg(cprnr))
+            if (cpr[6] == '-')
             {
                 return true;
             }
             else
-            {
                 return false;
-            }
         }
     }
 }
